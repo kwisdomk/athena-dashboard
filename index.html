@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athena Upgrades</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --bg-panel: #111827;
+            --bg-panel-hover: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --border-color: #374151;
+            
+            --priority-1: #ef4444; /* Red - Critical */
+            --priority-2: #f59e0b; /* Amber - High */
+            --priority-3: #10b981; /* Green - Medium */
+            --priority-4: #6366f1; /* Indigo - Low */
+            
+            --font-main: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+        }
+
+        h1 span {
+            color: var(--accent-blue);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sys-badge {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Summary Row */
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        
+        .stat-value.accent {
+            color: var(--accent-blue);
+        }
+
+        .stat-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Table & Filters */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(31, 41, 55, 0.5);
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: background-color 0.15s;
+        }
+
+        tbody tr:hover {
+            background-color: var(--bg-panel-hover);
+        }
+
+        .row-done {
+            opacity: 0.5;
+        }
+
+        .row-done td:not(:last-child) {
+            text-decoration: line-through;
+        }
+
+        /* Badges & Toggles */
+        .category-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: #374151;
+            color: #d1d5db;
+        }
+        
+        .cat-hardware { background-color: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .cat-software { background-color: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .cat-accessory { background-color: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+
+        .priority-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .prio-1 { background-color: var(--priority-1); box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+        .prio-2 { background-color: var(--priority-2); }
+        .prio-3 { background-color: var(--priority-3); }
+        .prio-4 { background-color: var(--priority-4); }
+
+        .toggle-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            width: 100px;
+            text-align: center;
+        }
+
+        .toggle-btn.pending {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .toggle-btn.pending:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .toggle-btn.done {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: var(--priority-3);
+            color: var(--priority-3);
+        }
+
+        /* Sidebar Elements */
+        .queue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .queue-item:last-child {
+            border-bottom: none;
+        }
+
+        .queue-item.done {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+
+        .queue-num {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            min-width: 20px;
+        }
+
+        .queue-details strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .queue-details span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .note-card {
+            background-color: rgba(245, 158, 11, 0.05);
+            border-left: 3px solid var(--priority-2);
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.85rem;
+            color: #d1d5db;
+        }
+        
+        /* Chart Controls */
+        .chart-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .currency-toggle {
+            display: flex;
+            background: #1f2937;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+        }
+        
+        .currency-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 0.3rem;
+            cursor: pointer;
+        }
+        
+        .currency-btn.active {
+            background: var(--bg-panel);
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .price-col {
+            font-family: 'Consolas', monospace;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Athena <span>Upgrades</span></h1>
+        <div class="subtitle">
+            HP Victus 15 
+            <span class="sys-badge">i5-13420H</span>
+            <span class="sys-badge">RTX 3050 6GB</span>
+        </div>
+    </header>
+
+    <div class="summary-row">
+        <div class="stat-card">
+            <span class="stat-label">Pending Cost (KES)</span>
+            <span class="stat-value accent" id="val-kes">KSh 0</span>
+            <span class="stat-subtext" id="sub-kes">Total: KSh 0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Pending Cost (USD)</span>
+            <span class="stat-value" id="val-usd">$0</span>
+            <span class="stat-subtext" id="sub-usd">Total: $0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Progress</span>
+            <span class="stat-value" id="val-progress">0 / 8</span>
+            <span class="stat-subtext">Items Completed</span>
+        </div>
+        <div class="stat-card" style="border-color: rgba(16, 185, 129, 0.3); background-color: rgba(16, 185, 129, 0.05);">
+            <span class="stat-label" style="color: var(--priority-3);">Battery Health</span>
+            <span class="stat-value" style="color: var(--text-main);">92.5%</span>
+            <span class="stat-subtext">231 Cycles • Care Mode Target</span>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Main Column -->
+        <div class="main-col" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Table Section -->
+            <div class="card">
+                <h2>Parts & Software Matrix</h2>
+                <div class="filters" id="filter-container">
+                    <button class="filter-btn active" data-filter="All">All</button>
+                    <button class="filter-btn" data-filter="Hardware">Hardware</button>
+                    <button class="filter-btn" data-filter="Software">Software</button>
+                    <button class="filter-btn" data-filter="Accessory">Accessory</button>
+                    <button class="filter-btn" data-filter="Free">Free</button>
+                    <button class="filter-btn" data-filter="Paid">Paid</button>
+                    <button class="filter-btn" data-filter="Priority">Priority 1</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Part Name</th>
+                                <th>Category</th>
+                                <th>Spec / Details</th>
+                                <th>KES Price</th>
+                                <th>USD</th>
+                                <th>Purpose & Impact</th>
+                                <th>Prio</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="card">
+                <div class="chart-controls">
+                    <h2>Cost Comparison (Paid Items)</h2>
+                    <div class="currency-toggle">
+                        <button class="currency-btn active" id="btn-chart-kes">KES</button>
+                        <button class="currency-btn" id="btn-chart-usd">USD</button>
+                    </div>
+                </div>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="side-col" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Priority Queue -->
+            <div class="card">
+                <h2>Execution Queue</h2>
+                <div id="queue-container">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Cautions -->
+            <div class="card">
+                <h2 style="color: var(--priority-2);">Warnings & Cautions</h2>
+                <div class="note-card">
+                    <strong>RAM Spec Check:</strong> Confirm DDR4-3200 (not 2400 or 2666) before purchasing to ensure dual-channel sync.
+                </div>
+                <div class="note-card">
+                    <strong>Storage Bottleneck:</strong> The Dahua SSD is PCIe Gen3. It fits the Gen4 slot perfectly but will max out at Gen3 speeds.
+                </div>
+                <div class="note-card">
+                    <strong>Benchmarking:</strong> Run Cinebench R23 baseline BEFORE installing RAM for accurate before/after performance comparison.
+                </div>
+                <div class="note-card">
+                    <strong>Battery Degradation:</strong> Battery Care Mode (80% cap) must be set in HP Command Center before anything else — zero cost, immediate benefit.
+                </div>
+                <div class="note-card" style="border-left-color: var(--priority-3); background-color: rgba(16, 185, 129, 0.05);">
+                    <strong style="color: var(--priority-3);">System Save:</strong> Your progress is automatically saved to local storage. Safe to close tab.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Core Data
+        const partsData = [
+            { id: 1, name: "8GB DDR4-3200 SO-DIMM", category: "Hardware", spec: "DDR4 3200MHz, 260-pin, SO-DIMM, 1.2V", kes: 6999, usd: 54, purpose: "Fill empty RAM slot → dual-channel", impact: "+30–40% memory bandwidth", priority: 1, isDone: false },
+            { id: 2, name: "Dahua 1TB NVMe M.2 PCIe Gen3x4", category: "Hardware", spec: "M.2 2280, PCIe 3.0 x4, NVMe, 2000/1600 MB/s", kes: 13500, usd: 104, purpose: "Second M.2 slot — mass storage", impact: "+1TB capacity, fast project storage", priority: 2, isDone: false },
+            { id: 3, name: "Laptop cooling fan stand", category: "Accessory", spec: "15.6\" compatible, USB-powered, dual fan", kes: 3500, usd: 27, purpose: "Elevate rear for airflow", impact: "↓ thermals under load", priority: 3, isDone: false },
+            { id: 4, name: "HP M24fe 23.8\" IPS Monitor", category: "Accessory", spec: "1920x1080, IPS, FreeSync, HDMI+VGA", kes: 17500, usd: 135, purpose: "External display via HDMI 2.1", impact: "2x screen real estate", priority: 4, isDone: false },
+            { id: 5, name: "CPU min state fix", category: "Software", spec: "powercfg PROCTHROTTLEMIN=5", kes: 0, usd: 0, purpose: "Stop CPU idling at 100% base", impact: "↓ idle temps and power draw", priority: 1, isDone: false },
+            { id: 6, name: "HP telemetry disable", category: "Software", spec: "Disable 3 services in services.msc", kes: 0, usd: 0, purpose: "Kill HP bloat eating RAM/CPU", impact: "+100–200MB usable RAM", priority: 1, isDone: false },
+            { id: 7, name: "Battery Care Mode 80%", category: "Software", spec: "HP Command Center setting", kes: 0, usd: 0, purpose: "Prevent overcharge", impact: "Extends battery lifespan", priority: 1, isDone: false },
+            { id: 8, name: "PCI Express ASPM", category: "Software", spec: "Power Options → Moderate Power Savings", kes: 0, usd: 0, purpose: "Reduce PCIe bus power draw", impact: "↓ temps, better battery on AC", priority: 2, isDone: false }
+        ];
+
+        let currentFilter = 'All';
+        let chartInstance = null;
+        let chartCurrency = 'KES'; // KES or USD
+
+        // Formatters
+        const fmtKES = new Intl.NumberFormat('en-KE');
+        const fmtUSD = new Intl.NumberFormat('en-US');
+
+        // Initialization
+        function init() {
+            loadState();
+            setupEventListeners();
+            renderAll();
+            initChart();
+        }
+
+        // Local Storage Functions
+        function saveState() {
+            const stateToSave = partsData.map(p => ({ id: p.id, isDone: p.isDone }));
+            localStorage.setItem('athenaUpgradesState', JSON.stringify(stateToSave));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('athenaUpgradesState');
+            if (savedState) {
+                try {
+                    const parsedState = JSON.parse(savedState);
+                    partsData.forEach(p => {
+                        const savedPart = parsedState.find(sp => sp.id === p.id);
+                        if (savedPart) p.isDone = savedPart.isDone;
+                    });
+                } catch (e) {
+                    console.error("Failed to load saved state", e);
+                }
+            }
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentFilter = e.target.getAttribute('data-filter');
+                    renderTable();
+                });
+            });
+
+            document.getElementById('btn-chart-kes').addEventListener('click', (e) => {
+                document.getElementById('btn-chart-usd').classList.remove('active');
+                e.target.classList.add('active');
+                chartCurrency = 'KES';
+                updateChart();
+            });
+
+            document.getElementById('btn-chart-usd').addEventListener('click', (e) => {
+                document.getElementById('btn-chart-kes').classList.remove('active');
+                e.target.classList.add('active');
+                chartCurrency = 'USD';
+                updateChart();
+            });
+        }
+
+        // Toggle Status
+        function toggleStatus(id) {
+            const part = partsData.find(p => p.id === id);
+            if (part) {
+                part.isDone = !part.isDone;
+                saveState();
+                renderAll();
+                updateChart();
+            }
+        }
+
+        // Main Render Controller
+        function renderAll() {
+            renderTable();
+            renderQueue();
+            renderSummary();
+        }
+
+        // Render Summary Cards
+        function renderSummary() {
+            let totalKes = 0, totalUsd = 0;
+            let pendingKes = 0, pendingUsd = 0;
+            let doneCount = 0;
+
+            partsData.forEach(p => {
+                totalKes += p.kes;
+                totalUsd += p.usd;
+                if (p.isDone) {
+                    doneCount++;
+                } else {
+                    pendingKes += p.kes;
+                    pendingUsd += p.usd;
+                }
+            });
+
+            document.getElementById('val-kes').textContent = `KSh ${fmtKES.format(pendingKes)}`;
+            document.getElementById('sub-kes').textContent = `Total Planned: KSh ${fmtKES.format(totalKes)}`;
+            
+            document.getElementById('val-usd').textContent = `$${fmtUSD.format(pendingUsd)}`;
+            document.getElementById('sub-usd').textContent = `Total Planned: $${fmtUSD.format(totalUsd)}`;
+
+            document.getElementById('val-progress').textContent = `${doneCount} / ${partsData.length}`;
+        }
+
+        // Render Table
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            let filtered = partsData;
+            if (currentFilter !== 'All') {
+                if (['Hardware', 'Software', 'Accessory'].includes(currentFilter)) {
+                    filtered = partsData.filter(p => p.category === currentFilter);
+                } else if (currentFilter === 'Free') {
+                    filtered = partsData.filter(p => p.kes === 0);
+                } else if (currentFilter === 'Paid') {
+                    filtered = partsData.filter(p => p.kes > 0);
+                } else if (currentFilter === 'Priority') {
+                    filtered = partsData.filter(p => p.priority === 1);
+                }
+            }
+
+            filtered.forEach(p => {
+                const catClass = p.category.toLowerCase();
+                const prioHTML = `<span class="priority-dot prio-${p.priority}"></span> ${p.priority}`;
+                
+                const btnClass = p.isDone ? 'done' : 'pending';
+                const btnText = p.isDone ? '✓ DONE' : 'PENDING';
+                const rowClass = p.isDone ? 'row-done' : '';
+
+                const tr = document.createElement('tr');
+                tr.className = rowClass;
+                tr.innerHTML = `
+                    <td style="font-weight: 500; color: ${p.isDone ? 'var(--text-muted)' : 'var(--text-main)'}">${p.name}</td>
+                    <td><span class="category-badge cat-${catClass}">${p.category}</span></td>
+                    <td style="font-size: 0.8rem; color: var(--text-muted); max-width: 200px;">${p.spec}</td>
+                    <td class="price-col">${p.kes > 0 ? fmtKES.format(p.kes) : 'Free'}</td>
+                    <td class="price-col">${p.usd > 0 ? '$'+p.usd : '-'}</td>
+                    <td>
+                        <div style="font-size: 0.85rem; margin-bottom: 2px;">${p.purpose}</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-blue);">${p.impact}</div>
+                    </td>
+                    <td>${prioHTML}</td>
+                    <td>
+                        <button class="toggle-btn ${btnClass}" onclick="toggleStatus(${p.id})">${btnText}</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Render Priority Queue
+        function renderQueue() {
+            const container = document.getElementById('queue-container');
+            container.innerHTML = '';
+
+            const sorted = [...partsData].sort((a, b) => {
+                if (a.isDone === b.isDone) return a.priority - b.priority;
+                return a.isDone ? 1 : -1;
+            });
+
+            sorted.forEach(p => {
+                const div = document.createElement('div');
+                div.className = `queue-item ${p.isDone ? 'done' : ''}`;
+                div.innerHTML = `
+                    <div class="queue-num">
+                        <span class="priority-dot prio-${p.priority}"></span>
+                    </div>
+                    <div class="queue-details">
+                        <strong>${p.name}</strong>
+                        <span>${p.kes === 0 ? 'Free Software Fix' : 'Est: KSh ' + fmtKES.format(p.kes)}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Chart.js Setup
+        function initChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            Chart.defaults.color = '#9ca3af';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: getChartData(),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            titleColor: '#f3f4f6',
+                            bodyColor: '#93c5fd',
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) {
+                                        label += chartCurrency === 'KES' ? 
+                                            'KSh ' + fmtKES.format(context.parsed.y) : 
+                                            '$' + context.parsed.y;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#374151', drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value);
+                                    return label.length > 15 ? label.substr(0, 15) + '...' : label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getChartData() {
+            const paidParts = partsData.filter(p => p.kes > 0);
+            return {
+                labels: paidParts.map(p => p.name),
+                datasets: [{
+                    label: 'Price',
+                    data: paidParts.map(p => chartCurrency === 'KES' ? p.kes : p.usd),
+                    backgroundColor: paidParts.map(p => p.isDone ? 'rgba(55, 65, 81, 0.8)' : 'rgba(59, 130, 246, 0.8)'),
+                    borderColor: paidParts.map(p => p.isDone ? '#4b5563' : '#60a5fa'),
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            };
+        }
+
+        function updateChart() {
+            if (chartInstance) {
+                chartInstance.data = getChartData();
+                chartInstance.update();
+            }
+        }
+
+        // Run
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
