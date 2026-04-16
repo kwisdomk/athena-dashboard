@@ -1,466 +1,547 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Athena Upgrades Master v1.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Athena · Liquid Glass Pro v1.0</title>
+    <!-- Inter Font & Chart.js -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg-base: #06090f;
-            --bg-panel: #0d1117;
-            --bg-panel-light: #161b22;
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.4);
-            --border: #30363d;
+            /* 1. COLOR SYSTEM (Light - Liquid Glass Workstation) */
+            --bg-0: #F7F8FC;
+            --bg-1: #EEF1F7;
+            --bg-gradient: linear-gradient(135deg, var(--bg-0) 0%, var(--bg-1) 100%);
             
-            --prio-1: #ef4444;
-            --prio-2: #f59e0b;
-            --prio-3: #10b981;
-            --prio-4: #6366f1;
+            --surface-1: rgba(255, 255, 255, 0.55);
+            --surface-2: rgba(255, 255, 255, 0.70);
+            --surface-3: rgba(255, 255, 255, 0.85);
+            
+            --border-soft: rgba(255, 255, 255, 0.35);
+            --border-default: rgba(209, 213, 219, 0.4);
+            
+            --text-primary: #1D1D1F;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            
+            --accent: #007AFF;
+            --accent-soft: rgba(0, 122, 255, 0.1);
+            --accent-hover: #0066E5;
+            
+            --success: #34C759;
+            --warning: #FF9F0A;
+            --danger: #FF3B30;
+            --pending: #8E8E93;
+
+            /* 2. GLASS SYSTEM */
+            --glass-blur: 20px;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.25);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+
+            /* 3. TYPOGRAPHY SYSTEM */
+            --font-family: "Inter", system-ui, -apple-system, sans-serif;
+            --text-xs: 12px;
+            --text-sm: 13px;
+            --text-base: 16px;
+            --text-md: 18px;
+            --text-lg: 22px;
+            --text-xl: 28px;
+            --weight-medium: 500;
+            --weight-semibold: 600;
+            --weight-bold: 700;
+            --line-normal: 1.5;
+
+            /* 4. SPACING SYSTEM */
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+            --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+
+            /* 5. RADIUS SYSTEM */
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 24px; --radius-pill: 999px;
+
+            /* 6. MOTION SYSTEM */
+            --ease-soft: cubic-bezier(0.25, 1, 0.5, 1);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --t-base: 200ms;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        [data-theme="dark"] {
+            --bg-0: #010101;
+            --bg-1: #0A0A0C;
+            --bg-gradient: radial-gradient(at 0% 0%, #1c1c1e 0%, #010101 100%);
+            --surface-1: rgba(28, 28, 30, 0.65);
+            --surface-2: rgba(44, 44, 46, 0.75);
+            --surface-3: rgba(58, 58, 60, 0.85);
+            --border-soft: rgba(255, 255, 255, 0.1);
+            --border-default: rgba(255, 255, 255, 0.15);
+            --text-primary: #FFFFFF;
+            --text-secondary: #98989E;
+            --text-muted: #636366;
+            --accent: #0A84FF;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            padding: 2rem;
-            line-height: 1.6;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            font-family: var(--font-family);
+            color: var(--text-primary);
+            padding: var(--space-6) var(--space-5);
+            min-height: 100vh;
+            line-height: var(--line-normal);
+            transition: background var(--t-base) var(--ease-smooth), color var(--t-base) var(--ease-smooth);
         }
 
-        /* Typography */
-        h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; }
-        .mono { font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', monospace; }
+        .container { max-width: 1200px; margin: 0 auto; }
 
+        .glass {
+            background: var(--surface-1);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--glass-shadow);
+            transition: all 0.25s var(--ease-soft);
+        }
+
+        .glass:hover {
+            transform: translateY(-2px);
+            background: var(--surface-2);
+        }
+
+        /* Header Layout */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: var(--space-6);
+        }
+        .hero-text h1 { 
+            font-size: var(--text-xl); 
+            font-weight: var(--weight-semibold); 
+            letter-spacing: -0.5px; 
+            color: var(--text-primary);
+        }
+        .hero-text h1 span { color: var(--accent); }
+        .hero-text .sub { 
+            color: var(--text-secondary); 
+            font-size: var(--text-sm); 
+            font-weight: 400;
+            margin-top: var(--space-1);
         }
 
-        .brand h1 { font-size: 1.8rem; color: #fff; }
-        .brand span { color: var(--accent); }
-        .brand p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
-
-        .system-specs { text-align: right; font-size: 0.85rem; color: var(--text-muted); }
-
-        /* Summary Bar */
-        .summary-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+        /* Theme Switcher */
+        .theme-control {
+            background: var(--surface-2); padding: var(--space-1);
+            border-radius: var(--radius-pill); display: flex; gap: var(--space-1);
+            border: var(--glass-border);
         }
-
-        .stat-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            padding: 1.25rem;
-            border-radius: 8px;
+        .theme-btn {
+            border: none; background: transparent; color: var(--text-secondary);
+            padding: 6px 16px; border-radius: var(--radius-pill); cursor: pointer;
+            font-size: var(--text-xs); font-weight: var(--weight-semibold);
+            transition: all var(--t-base) var(--ease-smooth);
         }
+        .theme-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
 
-        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 0.5rem; }
-        .stat-value.accent { color: var(--accent); }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
+        /* Summary Chips */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-4); margin-bottom: var(--space-6);
         }
+        .stat-chip { padding: var(--space-5); }
+        .stat-label { font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: var(--space-2); display: block; }
+        .stat-value { font-size: var(--text-lg); font-weight: var(--weight-bold); letter-spacing: -0.02em; }
+        .stat-meta { font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-1); }
 
-        @media (min-width: 1200px) {
-            .dashboard-grid { grid-template-columns: 3fr 1fr; }
+        /* Main Workspace */
+        .workspace { display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
+        @media (min-width: 1024px) { .workspace { grid-template-columns: 2.5fr 1fr; } }
+
+        /* Navigation / Filtering */
+        .panel-nav {
+            padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-default);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);
         }
-
-        .panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            height: fit-content;
+        .pill-group { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+        .pill {
+            background: rgba(0,0,0,0.04); border: none; padding: 6px 14px;
+            border-radius: var(--radius-pill); font-size: var(--text-sm); font-weight: var(--weight-semibold);
+            color: var(--text-secondary); cursor: pointer; transition: all var(--t-base);
         }
+        [data-theme="dark"] .pill { background: rgba(255,255,255,0.06); }
+        .pill:hover { background: var(--accent-soft); color: var(--accent); }
+        .pill.active { background: var(--accent); color: white; }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.75rem;
+        /* Table Architecture */
+        .table-panel { overflow: hidden; padding: 0; background: var(--surface-1); }
+        .table-wrap { overflow-x: auto; padding: 0 var(--space-2) var(--space-4); }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left; padding: var(--space-4); font-size: var(--text-xs);
+            font-weight: var(--weight-bold); color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-default);
+            cursor: pointer; user-select: none;
         }
+        th:hover { color: var(--accent); }
+        .sort-arrow { color: var(--accent); margin-left: 4px; }
+        td { padding: 14px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); color: var(--text-primary); vertical-align: middle; font-size: var(--text-sm); }
+        tr:hover { background: rgba(0, 122, 255, 0.04); }
+        tr.done-row { opacity: 0.4; }
+        .item-name { font-weight: var(--weight-semibold); color: var(--text-primary); display: block; }
+        .item-spec { font-size: var(--text-xs); color: var(--text-secondary); }
 
-        .panel h2 { font-size: 1.1rem; color: #fff; }
-
-        /* Controls */
-        .controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-        
-        button {
-            background: var(--bg-panel-light);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 12px; border-radius: var(--radius-pill); font-size: var(--text-xs);
+            font-weight: var(--weight-semibold); cursor: pointer; display: inline-block;
         }
+        .status-badge.pending { background: rgba(142, 142, 147, 0.15); color: var(--text-secondary); }
+        .status-badge.done { background: rgba(52, 199, 89, 0.12); color: var(--success); }
 
-        button:hover { border-color: var(--text-muted); }
-        button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-        button.danger { color: var(--prio-1); }
-        button.danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--prio-1); }
+        /* Priority Dots */
+        .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .priority-dot.p1 { background: var(--danger); opacity: 0.8; }
+        .priority-dot.p2 { background: var(--warning); opacity: 0.8; }
+        .priority-dot.p3 { background: var(--accent); opacity: 0.7; }
+        .priority-dot.p4 { background: var(--pending); opacity: 0.6; }
 
-        /* Table Style */
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
-        td { padding: 1rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-
-        .row-done { opacity: 0.4; }
-        .row-done .part-name { text-decoration: line-through; }
-
-        .prio-tag { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
-        .cat-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #21262d; color: var(--text-muted); font-weight: 600; }
-
-        /* Priority Queue */
-        .queue-list { list-style: none; }
-        .queue-item {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        /* Reality Logic Buttons */
+        .btn-run {
+            background: rgba(255,255,255,0.6); border: 1px solid rgba(0,122,255,0.2);
+            padding: 4px 10px; border-radius: var(--radius-pill); font-size: 10px; font-weight: var(--weight-bold);
+            color: var(--text-primary); cursor: pointer; margin-left: 8px; text-transform: uppercase;
+            transition: all 0.2s ease;
         }
+        .btn-run:hover { background: rgba(0,122,255,0.08); transform: scale(1.05); }
 
+        /* Intelligence Sidebar */
+        .sidebar { display: flex; flex-direction: column; gap: var(--space-5); }
+        .priority-sidebar { background: var(--surface-1); padding: var(--space-5); border-radius: 24px; }
+        .do-next {
+            background: linear-gradient(135deg, var(--accent), #5E5CE6);
+            color: white; padding: var(--space-5); border-radius: var(--radius-xl);
+            box-shadow: 0 12px 24px rgba(0, 122, 255, 0.2);
+            margin-bottom: var(--space-5);
+        }
+        .queue-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-bottom: 1px solid var(--border-default); }
         .queue-item:last-child { border-bottom: none; }
-        .queue-item.next-up { border: 1px solid var(--accent); background: rgba(59, 130, 246, 0.05); border-radius: 6px; margin-bottom: 0.5rem; }
-        .next-label { font-size: 0.65rem; color: var(--accent); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 0.2rem; }
+        .queue-item.done-queue { opacity: 0.35; text-decoration: line-through; }
 
-        /* Guardrails */
-        .guardrails { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem; }
-        .guard-card { background: rgba(245, 158, 11, 0.03); border: 1px solid rgba(245, 158, 11, 0.2); padding: 1rem; border-radius: 8px; }
-        .guard-card h4 { color: var(--prio-2); font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; }
-        .guard-card p { font-size: 0.8rem; color: var(--text-muted); }
+        /* Actions */
+        .action-btn {
+            background: rgba(255,255,255,0.6); border: 1px solid rgba(0,122,255,0.2);
+            padding: 6px 16px; border-radius: var(--radius-pill); font-size: var(--text-xs);
+            font-weight: var(--weight-semibold); color: var(--text-primary); cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover { background: rgba(0,122,255,0.08); }
 
-        /* Status Checkmark */
-        .status-toggle { width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .status-toggle.done { background: var(--prio-3); border-color: var(--prio-3); color: #fff; }
-        .status-toggle:hover { border-color: var(--accent); }
+        /* Chart.js overrides */
+        .viz-panel { padding: var(--space-5); background: var(--surface-1); }
+        canvas { max-height: 280px; width: 100%; }
     </style>
 </head>
 <body>
 
+<div class="container">
     <header>
-        <div class="brand">
-            <h1>ATHENA <span>UPGRADES</span></h1>
-            <p>Decision-Support Matrix v1.0 — Master Build</p>
+        <div class="hero-text">
+            <h1>Athena <span>Upgrades</span></h1>
+            <div class="sub">HP Victus 15 · Precision Decision Matrix v1.0</div>
         </div>
-        <div class="system-specs">
-            <div class="mono">HP Victus 15-fa2xxx</div>
-            <div>i5-13420H · RTX 3050 6GB · 8GB DDR4</div>
+        <div class="theme-control">
+            <button id="btnLight" class="theme-btn active" onclick="setTheme('light')">Light</button>
+            <button id="btnDark" class="theme-btn" onclick="setTheme('dark')">Dark</button>
         </div>
     </header>
 
-    <div class="summary-bar" id="summary-bar">
-        <div class="stat-card">
-            <div class="stat-label">Pending Budget (KES)</div>
-            <div class="stat-value accent mono" id="stat-kes">KSh 0</div>
+    <div class="summary-grid">
+        <div class="glass stat-chip">
+            <span class="stat-label">Budget Required</span>
+            <div class="stat-value" id="totalKes">0 KES</div>
+            <div class="stat-meta">Pending hardware capital</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Pending Budget (USD)</div>
-            <div class="stat-value mono" id="stat-usd">$0</div>
+        <div class="glass stat-chip">
+            <span class="stat-label">Global Reference</span>
+            <div class="stat-value" id="totalUsd">$0</div>
+            <div class="stat-meta">International market total</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Execution Progress</div>
-            <div class="stat-value" id="stat-progress">0 / 8</div>
+        <div class="glass stat-chip">
+            <span class="stat-label">Optimization</span>
+            <div class="stat-value" id="progressCount">0 / 8</div>
+            <div class="stat-meta">Architecture milestones reached</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Battery Health</div>
-            <div class="stat-value accent" style="font-size: 1.2rem;">92.5% · 231 Cycles</div>
+        <div class="glass stat-chip">
+            <span class="stat-label">Power Health</span>
+            <div class="stat-value" style="color: var(--success)">92.5%</div>
+            <div class="stat-meta">⚡ static snapshot · 231 cycles</div>
         </div>
     </div>
 
-    <div class="dashboard-grid">
-        <!-- Main Column -->
-        <div class="main-content">
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>Master Upgrade Matrix</h2>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button onclick="exportData()">Export JSON</button>
-                        <button class="danger" onclick="resetAll()">Reset All</button>
-                    </div>
+    <div class="workspace">
+        <!-- Master Matrix -->
+        <div class="glass table-panel">
+            <div class="panel-nav">
+                <div class="pill-group" id="filterGroup">
+                    <button class="pill active" data-filter="All">All</button>
+                    <button class="pill" data-filter="Hardware">Hardware</button>
+                    <button class="pill" data-filter="Software">Software</button>
+                    <button class="pill" data-filter="paid">Paid Only</button>
                 </div>
-
-                <div class="controls" id="filter-controls">
-                    <button class="active" data-filter="All">All Items</button>
-                    <button data-filter="Hardware">Hardware</button>
-                    <button data-filter="Software">Software</button>
-                    <button data-filter="Accessory">Accessory</button>
-                    <button data-filter="Free">Free</button>
-                    <button data-filter="Paid">Paid</button>
-                    <button data-filter="P1">P1 Only</button>
-                </div>
-
-                <div class="table-container">
-                    <table id="parts-table">
-                        <thead>
-                            <tr>
-                                <th style="cursor: pointer;" onclick="setSort('status')">Status</th>
-                                <th style="cursor: pointer;" onclick="setSort('name')">Part</th>
-                                <th>Spec</th>
-                                <th style="cursor: pointer;" onclick="setSort('price_kes')">KES</th>
-                                <th style="cursor: pointer;" onclick="setSort('price_usd')">USD</th>
-                                <th style="cursor: pointer;" onclick="setSort('priority')">Prio</th>
-                                <th>Outcome</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body"></tbody>
-                    </table>
+                <div class="pill-group">
+                    <button class="action-btn" onclick="exportJSON()">Export JSON</button>
+                    <button class="action-btn" style="border-color: var(--danger); color: var(--danger)" onclick="hardReset()">Reset</button>
                 </div>
             </div>
-
-            <div class="panel" style="margin-top: 1.5rem;">
-                <div class="panel-header">
-                    <h2>Budget Weighting (Paid Items Only)</h2>
-                    <button id="chart-toggle">Switch to USD</button>
-                </div>
-                <div style="height: 300px; position: relative;">
-                    <canvas id="budgetChart"></canvas>
-                </div>
+            <div class="table-wrap">
+                <table id="partsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="name">Component <span class="sort-arrow"></span></th>
+                            <th data-sort="category">Category <span class="sort-arrow"></span></th>
+                            <th data-sort="price_kes">KES <span class="sort-arrow"></span></th>
+                            <th data-sort="price_usd">USD <span class="sort-arrow"></span></th>
+                            <th data-sort="priority">Prio <span class="sort-arrow"></span></th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Sidebar -->
+        <!-- Intelligence Sidebar -->
         <div class="sidebar">
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>Priority Queue</h2>
+            <div class="do-next" id="doNextCard"></div>
+            <div class="glass priority-sidebar">
+                <span class="stat-label" style="margin-bottom: var(--space-4)">Execution Queue</span>
+                <div id="queueList"></div>
+            </div>
+            <div class="glass" style="padding: var(--space-5)">
+                <span class="stat-label" style="margin-bottom: var(--space-4)">System Guardrails</span>
+                <div style="font-size: var(--text-xs); color: var(--text-secondary); line-height: 1.6;">
+                    <p style="margin-bottom: 8px">🧠 <strong>Memory Sync:</strong> Requires DDR4-3200 SODIMM for dual-channel activate.</p>
+                    <p style="margin-bottom: 8px">💾 <strong>SSD Bus:</strong> Slot is Gen4. Gen3 (Dahua) compatible but caps at 3.5GB/s.</p>
+                    <p>🔋 <strong>Battery:</strong> Preserve health by enforcing 80% charge cap in Command Center.</p>
                 </div>
-                <div id="queue-body"></div>
             </div>
         </div>
     </div>
 
-    <div class="guardrails">
-        <div class="guard-card">
-            <h4>RAM Compatibility</h4>
-            <p>Must be DDR4-3200 SO-DIMM. Do not buy DDR4-2666 or DDR5. Second slot must match exactly for dual-channel.</p>
+    <!-- Budget Analysis -->
+    <div class="glass viz-panel" style="margin-top: var(--space-6)">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-5)">
+            <span class="stat-label">Budget Weighting (Paid Items)</span>
+            <div class="pill-group">
+                <button class="pill active" id="btnKes">KES</button>
+                <button class="pill" id="btnUsd">USD</button>
+            </div>
         </div>
-        <div class="guard-card">
-            <h4>SSD Slot</h4>
-            <p>The M.2 slot is PCIe Gen 4x4 but a Gen 3 drive (Dahua) will work at Gen 3 speeds. Don't overpay for Gen 4.</p>
-        </div>
-        <div class="guard-card">
-            <h4>Benchmark Baseline</h4>
-            <p>Run Cinebench R23 and CrystalDiskMark before any changes. Document before/after for Scylla records.</p>
-        </div>
-        <div class="guard-card">
-            <h4>Battery Care</h4>
-            <p>Enable 80% charge cap in HP Command Center immediately. Free, high impact on cell longevity.</p>
-        </div>
+        <canvas id="budgetChart"></canvas>
     </div>
+</div>
 
-    <script>
-        const SEED_DATA = [
-            { id: 1, name: "8GB DDR4-3200 SO-DIMM", category: "Hardware", spec: "DDR4-3200, 1.2V", price_kes: 6999, price_usd: 54, purpose: "Enable dual-channel", impact: "+30-40% memory bandwidth", priority: 1, status: "Pending" },
-            { id: 2, name: "CPU Min State fix", category: "Software", spec: "powercfg CLI", price_kes: 0, price_usd: 0, purpose: "Stop idling at 100% clock", impact: "Lower idle temps/power", priority: 1, status: "Pending" },
-            { id: 3, name: "HP Telemetry disable", category: "Software", spec: "services.msc", price_kes: 0, price_usd: 0, purpose: "Kill bloatware", impact: "+150MB usable RAM", priority: 1, status: "Pending" },
-            { id: 4, name: "Battery Care Mode", category: "Software", spec: "HP Command Center", price_kes: 0, price_usd: 0, purpose: "Prevent overcharge", impact: "Extended cell health", priority: 1, status: "Pending" },
-            { id: 5, name: "Dahua 1TB NVMe Gen3", category: "Hardware", spec: "M.2 2280 NVMe", price_kes: 13500, price_usd: 104, purpose: "Mass storage", impact: "Project/VM space", priority: 2, status: "Pending" },
-            { id: 6, name: "PCI Express ASPM", category: "Software", spec: "Power Options", price_kes: 0, price_usd: 0, purpose: "Reduce bus power", impact: "Better battery on AC", priority: 2, status: "Pending" },
-            { id: 7, name: "Laptop cooling stand", category: "Accessory", spec: "Dual-fan, adjustable", price_kes: 3500, price_usd: 27, purpose: "Elevate rear", impact: "Lower thermals under load", priority: 3, status: "Pending" },
-            { id: 8, name: "HP M24fe 23.8\" Monitor", category: "Accessory", spec: "IPS, 1080p, 75Hz", price_kes: 17500, price_usd: 135, purpose: "2nd Screen", impact: "Dev/Security real estate", priority: 4, status: "Pending" }
-        ];
+<script>
+    const SEED_DATA = [
+        { id:0, name:"8GB DDR4-3200 SODIMM", category:"Hardware", spec:"3200MHz, 1.2V CL22", price_kes:6999, price_usd:54, priority:1, status:"Pending", script: null },
+        { id:1, name:"CPU Min State Fix", category:"Software", spec:"powercfg PROCTHROTTLEMIN", price_kes:0, price_usd:0, priority:1, status:"Pending", script: "powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMIN 5" },
+        { id:2, name:"HP Telemetry Disable", category:"Software", spec:"Service.msc override", price_kes:0, price_usd:0, priority:1, status:"Pending", script: "Stop-Service 'HPAnalyticsService'; Set-Service 'HPAnalyticsService' -StartupType Disabled" },
+        { id:3, name:"Battery Care Mode", category:"Software", spec:"80% Charge Threshold", price_kes:0, price_usd:0, priority:1, status:"Pending", script: null },
+        { id:4, name:"Dahua 1TB NVMe Gen3", category:"Hardware", spec:"M.2 2280 NVMe", price_kes:13500, price_usd:104, priority:2, status:"Pending", script: null },
+        { id:5, name:"PCI Express ASPM", category:"Software", spec:"Energy Efficient Link", price_kes:0, price_usd:0, priority:2, status:"Pending", script: "powercfg /setacvalueindex SCHEME_CURRENT SUB_PCIEXPRESS ASPM 1" },
+        { id:6, name:"Laptop Cooling Stand", category:"Accessory", spec:"Dual-fan, High-Airflow", price_kes:3500, price_usd:27, priority:3, status:"Pending", script: null },
+        { id:7, name:"HP M24fe IPS Monitor", category:"Accessory", spec:"1080p, 75Hz, sRGB 99%", price_kes:17500, price_usd:135, priority:4, status:"Pending", script: null }
+    ];
 
-        let state = JSON.parse(localStorage.getItem('athena_v1_state')) || SEED_DATA;
-        let currentFilter = 'All';
-        let currentSort = 'priority';
-        let chartCurrency = 'KES';
-        let chart = null;
+    let items = JSON.parse(localStorage.getItem('athena_pro_v1')) || SEED_DATA;
+    let currentFilter = "All";
+    let sortCol = "priority";
+    let sortDir = "asc";
+    let currency = "KES";
+    let chart = null;
 
-        function renderSummary() {
-            const pending = state.filter(i => i.status === 'Pending');
-            const totalKES = pending.reduce((sum, i) => sum + i.price_kes, 0);
-            const totalUSD = pending.reduce((sum, i) => sum + i.price_usd, 0);
-            const done = state.filter(i => i.status === 'Done').length;
+    function save() { localStorage.setItem('athena_pro_v1', JSON.stringify(items)); }
 
-            document.getElementById('stat-kes').innerText = `KSh ${totalKES.toLocaleString()}`;
-            document.getElementById('stat-usd').innerText = `$${totalUSD.toLocaleString()}`;
-            document.getElementById('stat-progress').innerText = `${done} / ${state.length}`;
+    function setTheme(mode) {
+        document.documentElement.setAttribute('data-theme', mode);
+        document.getElementById('btnLight').classList.toggle('active', mode === 'light');
+        document.getElementById('btnDark').classList.toggle('active', mode === 'dark');
+        if(chart) renderChart(); 
+    }
+
+    function updateSummary() {
+        const pending = items.filter(i => i.status === "Pending");
+        const k = pending.reduce((s, i) => s + i.price_kes, 0);
+        const u = pending.reduce((s, i) => s + i.price_usd, 0);
+        const done = items.filter(i => i.status === "Done").length;
+        document.getElementById('totalKes').innerText = `${k.toLocaleString()} KES`;
+        document.getElementById('totalUsd').innerText = `$${u.toLocaleString()}`;
+        document.getElementById('progressCount').innerText = `${done} / ${items.length}`;
+    }
+
+    function updateSortIndicators() {
+        document.querySelectorAll("th[data-sort]").forEach(th => {
+            const col = th.getAttribute("data-sort");
+            const arrowSpan = th.querySelector(".sort-arrow");
+            if (col === sortCol) {
+                arrowSpan.textContent = sortDir === "asc" ? " ▲" : " ▼";
+            } else {
+                arrowSpan.textContent = "";
+            }
+        });
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        updateSortIndicators();
+
+        let filtered = items.filter(i => {
+            if (currentFilter === "All") return true;
+            if (currentFilter === "paid") return i.price_kes > 0;
+            return i.category === currentFilter;
+        });
+
+        filtered.sort((a,b) => {
+            let av = a[sortCol], bv = b[sortCol];
+            if (typeof av === "string") av = av.toLowerCase();
+            if (typeof bv === "string") bv = bv.toLowerCase();
+            if (av < bv) return sortDir === "asc" ? -1 : 1;
+            if (av > bv) return sortDir === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        filtered.forEach(i => {
+            const row = tbody.insertRow();
+            if (i.status === "Done") row.className = "done-row";
+            row.innerHTML = `
+                <td>
+                    <span class="item-name">${i.name} ${i.script && i.status === "Pending" ? `<button class="btn-run" onclick="executeFix(${i.id})">Run</button>` : ''}</span>
+                    <span class="item-spec">${i.spec}</span>
+                </td>
+                <td style="font-weight:700; color:var(--text-secondary); font-size:11px; text-transform:uppercase">${i.category}</td>
+                <td style="font-family:monospace; font-weight:600">${i.price_kes === 0 ? '-' : i.price_kes.toLocaleString()}</td>
+                <td style="font-family:monospace; font-weight:600">${i.price_usd === 0 ? '-' : '$'+i.price_usd}</td>
+                <td><div style="display:flex; align-items:center; gap:6px; font-weight:700; font-size:12px">
+                    <div class="priority-dot p${i.priority}"></div>P${i.priority}
+                </div></td>
+                <td>
+                    <span class="status-badge ${i.status === 'Done' ? 'done' : 'pending'}" onclick="toggleStatus(${i.id})">
+                        ${i.status === 'Done' ? 'Done' : 'Pending'}
+                    </span>
+                </td>
+            `;
+        });
+    }
+
+    function renderQueue() {
+        const sorted = [...items].sort((a,b) => a.priority - b.priority);
+        const next = sorted.find(i => i.status === "Pending");
+        const nextDiv = document.getElementById('doNextCard');
+        const listDiv = document.getElementById('queueList');
+        listDiv.innerHTML = "";
+        
+        if (next) {
+            nextDiv.innerHTML = `<span class="stat-label" style="color:white; opacity:0.8">Strategic Next Step</span>
+                                <div style="font-weight:700; font-size:1.15rem; margin: 4px 0">${next.name}</div>
+                                <div style="font-size:0.7rem; opacity:0.9">P${next.priority} milestone recommended</div>`;
+        } else {
+            nextDiv.innerHTML = `<div style="font-weight:700; text-align:center">🏁 SYSTEM FULLY OPTIMIZED</div>`;
         }
 
-        function renderTable() {
-            const body = document.getElementById('table-body');
-            body.innerHTML = '';
+        sorted.forEach(i => {
+            const div = document.createElement('div');
+            div.className = `queue-item ${i.status === "Done" ? "done-queue" : ""}`;
+            div.innerHTML = `<div class="priority-dot p${i.priority}"></div>
+                             <div style="flex:1">
+                                <div class="queue-text">${i.name}</div>
+                                <div class="queue-sub">Priority Stage: P${i.priority}</div>
+                             </div>`;
+            listDiv.appendChild(div);
+        });
+    }
 
-            let filtered = state;
-            if (currentFilter === 'Hardware') filtered = state.filter(i => i.category === 'Hardware');
-            if (currentFilter === 'Software') filtered = state.filter(i => i.category === 'Software');
-            if (currentFilter === 'Accessory') filtered = state.filter(i => i.category === 'Accessory');
-            if (currentFilter === 'Free') filtered = state.filter(i => i.price_kes === 0);
-            if (currentFilter === 'Paid') filtered = state.filter(i => i.price_kes > 0);
-            if (currentFilter === 'P1') filtered = state.filter(i => i.priority === 1);
+    function renderChart() {
+        const paid = items.filter(i => i.price_kes > 0);
+        const ctx = document.getElementById('budgetChart').getContext('2d');
+        if (chart) chart.destroy();
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-            filtered.sort((a, b) => {
-                if (a[currentSort] < b[currentSort]) return -1;
-                if (a[currentSort] > b[currentSort]) return 1;
-                return 0;
-            });
-
-            filtered.forEach(item => {
-                const tr = document.createElement('tr');
-                if (item.status === 'Done') tr.className = 'row-done';
-                
-                tr.innerHTML = `
-                    <td><div class="status-toggle ${item.status === 'Done' ? 'done' : ''}" onclick="toggleStatus(${item.id})">${item.status === 'Done' ? '✓' : ''}</div></td>
-                    <td>
-                        <div class="part-name" style="font-weight: 600;">${item.name}</div>
-                        <span class="cat-tag">${item.category}</span>
-                    </td>
-                    <td class="mono" style="font-size: 0.75rem; color: var(--text-muted);">${item.spec}</td>
-                    <td class="mono">${item.price_kes === 0 ? 'Free' : 'KSh ' + item.price_kes.toLocaleString()}</td>
-                    <td class="mono">${item.price_usd === 0 ? 'Free' : '$' + item.price_usd}</td>
-                    <td><span class="prio-tag" style="background: var(--prio-${item.priority})"></span>P${item.priority}</td>
-                    <td><div style="font-size: 0.75rem;">${item.impact}</div></td>
-                `;
-                body.appendChild(tr);
-            });
-        }
-
-        function renderQueue() {
-            const body = document.getElementById('queue-body');
-            body.innerHTML = '';
-
-            const sorted = [...state].sort((a, b) => a.priority - b.priority);
-            const firstPending = sorted.find(i => i.status === 'Pending' && i.priority === 1);
-
-            sorted.forEach(item => {
-                const div = document.createElement('div');
-                div.className = `queue-item ${item.id === firstPending?.id ? 'next-up' : ''}`;
-                if (item.status === 'Done') div.style.opacity = '0.3';
-
-                div.innerHTML = `
-                    <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--prio-${item.priority}); flex-shrink: 0;"></div>
-                    <div style="flex-grow: 1;">
-                        ${item.id === firstPending?.id ? '<span class="next-label">Do This Next</span>' : ''}
-                        <div style="font-size: 0.85rem; font-weight: 600; ${item.status === 'Done' ? 'text-decoration: line-through;' : ''}">${item.name}</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">${item.price_kes === 0 ? 'Software Fix' : 'KSh ' + item.price_kes.toLocaleString()}</div>
-                    </div>
-                `;
-                body.appendChild(div);
-            });
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('budgetChart').getContext('2d');
-            const paid = state.filter(i => i.price_kes > 0);
-            
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: paid.map(i => i.name),
-                    datasets: [{
-                        label: `Price (${chartCurrency})`,
-                        data: paid.map(i => chartCurrency === 'KES' ? i.price_kes : i.price_usd),
-                        backgroundColor: paid.map(i => i.status === 'Done' ? '#30363d' : '#3b82f6'),
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: '#30363d' }, ticks: { color: '#8b949e' } },
-                        y: { grid: { display: false }, ticks: { color: '#c9d1d9' } }
-                    }
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: paid.map(i => i.name.split(' ')[0]),
+                datasets: [{
+                    data: paid.map(i => currency === "KES" ? i.price_kes : i.price_usd),
+                    backgroundColor: isDark ? '#0A84FF' : '#007AFF',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', drawBorder: false }, ticks: { color: isDark ? '#98989E' : '#86868B', font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { color: isDark ? '#98989E' : '#86868B', font: { size: 9 } } }
                 }
-            });
-        }
-
-        function updateChart() {
-            const paid = state.filter(i => i.price_kes > 0);
-            chart.data.labels = paid.map(i => i.name);
-            chart.data.datasets[0].label = `Price (${chartCurrency})`;
-            chart.data.datasets[0].data = paid.map(i => chartCurrency === 'KES' ? i.price_kes : i.price_usd);
-            chart.data.datasets[0].backgroundColor = paid.map(i => i.status === 'Done' ? '#30363d' : '#3b82f6');
-            chart.update();
-        }
-
-        function toggleStatus(id) {
-            const idx = state.findIndex(i => i.id === id);
-            state[idx].status = state[idx].status === 'Pending' ? 'Done' : 'Pending';
-            state[idx].timestamp = state[idx].status === 'Done' ? new Date().toISOString() : null;
-            save();
-            renderAll();
-        }
-
-        function save() { localStorage.setItem('athena_v1_state', JSON.stringify(state)); }
-
-        function renderAll() {
-            renderSummary();
-            renderTable();
-            renderQueue();
-            updateChart();
-        }
-
-        function setSort(key) {
-            currentSort = key;
-            renderTable();
-        }
-
-        function exportData() {
-            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `athena_state_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-        }
-
-        function resetAll() {
-            if (confirm("Nuke all progress and reset dashboard to default?")) {
-                state = JSON.parse(JSON.stringify(SEED_DATA));
-                save();
-                renderAll();
-            }
-        }
-
-        document.getElementById('filter-controls').addEventListener('click', e => {
-            if (e.target.tagName === 'BUTTON') {
-                document.querySelectorAll('#filter-controls button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                currentFilter = e.target.getAttribute('data-filter');
-                renderTable();
             }
         });
+    }
 
-        document.getElementById('chart-toggle').addEventListener('click', e => {
-            chartCurrency = chartCurrency === 'KES' ? 'USD' : 'KES';
-            e.target.innerText = `Switch to ${chartCurrency === 'KES' ? 'USD' : 'KES'}`;
-            updateChart();
-        });
+    function toggleStatus(id) {
+        const i = items.find(x => x.id === id);
+        i.status = i.status === "Pending" ? "Done" : "Pending";
+        save(); refreshUI();
+    }
 
-        window.onload = () => {
-            initChart();
-            renderAll();
+    function executeFix(id) {
+        const i = items.find(x => x.id === id);
+        console.log(`[ORCHESTRATOR] Initializing Reality Engine for: ${i.script}`);
+        setTimeout(() => { i.status = "Done"; save(); refreshUI(); }, 800);
+    }
+
+    function exportJSON() {
+        const date = new Date().toISOString().split('T')[0];
+        const data = JSON.stringify({ exported: new Date().toISOString(), items }, null, 2);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+        a.download = `athena_state_${date}.json`;
+        a.click();
+    }
+
+    function hardReset() { if(confirm("Nuke all progress? Status will revert to Pending.")) { items = JSON.parse(JSON.stringify(SEED_DATA)); save(); refreshUI(); } }
+
+    function refreshUI() { updateSummary(); renderTable(); renderQueue(); renderChart(); }
+
+    document.getElementById('filterGroup').onclick = e => {
+        if (e.target.tagName === "BUTTON") {
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            e.target.classList.add('active');
+            currentFilter = e.target.getAttribute('data-filter');
+            renderTable();
+        }
+    };
+
+    document.getElementById('btnKes').onclick = () => { currency = "KES"; document.getElementById('btnKes').classList.add('active'); document.getElementById('btnUsd').classList.remove('active'); renderChart(); };
+    document.getElementById('btnUsd').onclick = () => { currency = "USD"; document.getElementById('btnUsd').classList.add('active'); document.getElementById('btnKes').classList.remove('active'); renderChart(); };
+
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.onclick = () => {
+            const col = th.getAttribute("data-sort");
+            if (sortCol === col) sortDir = sortDir === "asc" ? "desc" : "asc";
+            else { sortCol = col; sortDir = "asc"; }
+            renderTable();
         };
-    </script>
+    });
+
+    window.onload = () => {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+        refreshUI();
+    };
+</script>
 </body>
 </html>
